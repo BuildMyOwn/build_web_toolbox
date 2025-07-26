@@ -225,6 +225,8 @@ import { defineEventHandler } from 'h3'
 import QRCode from 'qrcode'
 import sharp from 'sharp'
 
+import ReferenceAnswer from '@/components/common/ReferenceAnswer.vue';
+
 export default defineEventHandler(async (event) => {
   // 获取表单数据
   const formData = await readMultipartFormData(event)

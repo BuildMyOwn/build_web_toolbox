@@ -386,6 +386,8 @@ export const GET: APIRoute = async ({ request }) => {
 // pages/api/weather/cities.ts
 import type { APIRoute } from 'astro'
 
+import ReferenceAnswer from '@/components/common/ReferenceAnswer.vue';
+
 interface CitySearchResponse {
   cities: string[]
 }

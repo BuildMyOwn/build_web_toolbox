@@ -325,6 +325,8 @@ function clearHistory() {
 // server/api/express/query.ts
 import { defineEventHandler, readBody } from 'h3'
 
+import ReferenceAnswer from '@/components/common/ReferenceAnswer.vue';
+
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event)

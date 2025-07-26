@@ -437,6 +437,8 @@ const handleConvert = async (file: File) => {
 // workers/imageProcessor.worker.ts
 import sharp from 'sharp'
 
+import ReferenceAnswer from '@/components/common/ReferenceAnswer.vue';
+
 self.addEventListener('message', async (e) => {
   const { file, type, options } = e.data
 
