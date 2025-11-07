@@ -9,9 +9,9 @@ description: 开发在线工具箱的二维码生成功能，包括自定义样�
 
 - 文本/链接转二维码
 - 自定义二维码样式
-  - 颜色选择
-  - 大小调整
-  - Logo 添加
+    - 颜色选择
+    - 大小调整
+    - Logo 添加
 - 二维码下载（PNG/SVG）
 
 ## 页面设计
@@ -21,201 +21,177 @@ description: 开发在线工具箱的二维码生成功能，包括自定义样�
 ```vue
 <!-- pages/tools/qrcode.vue -->
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed } from "vue";
 
 // 表单数据
 const form = ref({
-  content: '',
-  size: 200,
-  foreground: '#000000',
-  background: '#FFFFFF',
-  logo: null as File | null
-})
+    content: "",
+    size: 200,
+    foreground: "#000000",
+    background: "#FFFFFF",
+    logo: null as File | null,
+});
 
 // 二维码图片 URL
-const qrcodeUrl = ref<string | null>(null)
+const qrcodeUrl = ref<string | null>(null);
 
 // 生成二维码
 async function handleGenerate() {
-  if (!form.value.content) {
-    return
-  }
-  
-  const formData = new FormData()
-  formData.append('content', form.value.content)
-  formData.append('size', form.value.size.toString())
-  formData.append('foreground', form.value.foreground)
-  formData.append('background', form.value.background)
-  if (form.value.logo) {
-    formData.append('logo', form.value.logo)
-  }
-  
-  try {
-    const response = await fetch('/api/qrcode/generate', {
-      method: 'POST',
-      body: formData
-    })
-    const data = await response.json()
-    
-    if (!data.success) {
-      throw new Error(data.message)
+    if (!form.value.content) {
+        return;
     }
-    
-    qrcodeUrl.value = data.result.url
-  } catch (error) {
-    console.error('生成二维码失败:', error)
-  }
+
+    const formData = new FormData();
+    formData.append("content", form.value.content);
+    formData.append("size", form.value.size.toString());
+    formData.append("foreground", form.value.foreground);
+    formData.append("background", form.value.background);
+    if (form.value.logo) {
+        formData.append("logo", form.value.logo);
+    }
+
+    try {
+        const response = await fetch("/api/qrcode/generate", {
+            method: "POST",
+            body: formData,
+        });
+        const data = await response.json();
+
+        if (!data.success) {
+            throw new Error(data.message);
+        }
+
+        qrcodeUrl.value = data.result.url;
+    } catch (error) {
+        console.error("生成二维码失败:", error);
+    }
 }
 
 // 下载二维码
-function handleDownload(format: 'png' | 'svg') {
-  if (!qrcodeUrl.value) return
-  
-  const link = document.createElement('a')
-  link.href = qrcodeUrl.value
-  link.download = `qrcode.${format}`
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
+function handleDownload(format: "png" | "svg") {
+    if (!qrcodeUrl.value) return;
+
+    const link = document.createElement("a");
+    link.href = qrcodeUrl.value;
+    link.download = `qrcode.${format}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 // 处理 Logo 上传
 function handleLogoUpload(event: Event) {
-  const input = event.target as HTMLInputElement
-  if (input.files && input.files[0]) {
-    form.value.logo = input.files[0]
-  }
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+        form.value.logo = input.files[0];
+    }
 }
 </script>
 
 <template>
-  <div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-8">二维码生成</h1>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <!-- 左侧表单 -->
-      <div class="card bg-base-100 shadow-xl">
-        <div class="card-body">
-          <!-- 内容输入 -->
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text">文本内容</span>
-            </label>
-            <textarea
-              v-model="form.content"
-              class="textarea textarea-bordered h-24"
-              placeholder="输入要转换的文本或链接"
-            />
-          </div>
-          
-          <!-- 大小设置 -->
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text">二维码大小</span>
-              <span class="label-text-alt">{{ form.size }}px</span>
-            </label>
-            <input
-              v-model="form.size"
-              type="range"
-              min="100"
-              max="500"
-              class="range"
-              step="10"
-            />
-          </div>
-          
-          <!-- 颜色设置 -->
-          <div class="grid grid-cols-2 gap-4">
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text">前景色</span>
-              </label>
-              <input
-                v-model="form.foreground"
-                type="color"
-                class="w-full h-10"
-              />
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="mb-8 text-3xl font-bold">二维码生成</h1>
+
+        <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+            <!-- 左侧表单 -->
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body">
+                    <!-- 内容输入 -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">文本内容</span>
+                        </label>
+                        <textarea
+                            v-model="form.content"
+                            class="textarea textarea-bordered h-24"
+                            placeholder="输入要转换的文本或链接"
+                        />
+                    </div>
+
+                    <!-- 大小设置 -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">二维码大小</span>
+                            <span class="label-text-alt">{{ form.size }}px</span>
+                        </label>
+                        <input
+                            v-model="form.size"
+                            type="range"
+                            min="100"
+                            max="500"
+                            class="range"
+                            step="10"
+                        />
+                    </div>
+
+                    <!-- 颜色设置 -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">前景色</span>
+                            </label>
+                            <input v-model="form.foreground" type="color" class="h-10 w-full" />
+                        </div>
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">背景色</span>
+                            </label>
+                            <input v-model="form.background" type="color" class="h-10 w-full" />
+                        </div>
+                    </div>
+
+                    <!-- Logo 上传 -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">Logo 图片</span>
+                        </label>
+                        <input
+                            type="file"
+                            class="file-input file-input-bordered w-full"
+                            accept="image/*"
+                            @change="handleLogoUpload"
+                        />
+                    </div>
+
+                    <!-- 生成按钮 -->
+                    <div class="mt-6">
+                        <button
+                            class="btn btn-primary w-full"
+                            @click="handleGenerate"
+                            :disabled="!form.content"
+                        >
+                            生成二维码
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text">背景色</span>
-              </label>
-              <input
-                v-model="form.background"
-                type="color"
-                class="w-full h-10"
-              />
+
+            <!-- 右侧预览 -->
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">预览</h2>
+
+                    <div v-if="qrcodeUrl" class="flex flex-col items-center gap-4">
+                        <img :src="qrcodeUrl" :alt="form.content" class="max-w-full" />
+
+                        <!-- 下载按钮 -->
+                        <div class="flex gap-2">
+                            <button class="btn btn-outline" @click="handleDownload('png')">
+                                下载 PNG
+                            </button>
+                            <button class="btn btn-outline" @click="handleDownload('svg')">
+                                下载 SVG
+                            </button>
+                        </div>
+                    </div>
+
+                    <div v-else class="flex h-[300px] items-center justify-center text-gray-400">
+                        二维码预览区域
+                    </div>
+                </div>
             </div>
-          </div>
-          
-          <!-- Logo 上传 -->
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text">Logo 图片</span>
-            </label>
-            <input
-              type="file"
-              class="file-input file-input-bordered w-full"
-              accept="image/*"
-              @change="handleLogoUpload"
-            />
-          </div>
-          
-          <!-- 生成按钮 -->
-          <div class="mt-6">
-            <button
-              class="btn btn-primary w-full"
-              @click="handleGenerate"
-              :disabled="!form.content"
-            >
-              生成二维码
-            </button>
-          </div>
         </div>
-      </div>
-      
-      <!-- 右侧预览 -->
-      <div class="card bg-base-100 shadow-xl">
-        <div class="card-body">
-          <h2 class="card-title mb-4">预览</h2>
-          
-          <div
-            v-if="qrcodeUrl"
-            class="flex flex-col items-center gap-4"
-          >
-            <img
-              :src="qrcodeUrl"
-              :alt="form.content"
-              class="max-w-full"
-            />
-            
-            <!-- 下载按钮 -->
-            <div class="flex gap-2">
-              <button
-                class="btn btn-outline"
-                @click="handleDownload('png')"
-              >
-                下载 PNG
-              </button>
-              <button
-                class="btn btn-outline"
-                @click="handleDownload('svg')"
-              >
-                下载 SVG
-              </button>
-            </div>
-          </div>
-          
-          <div
-            v-else
-            class="flex items-center justify-center h-[300px] text-gray-400"
-          >
-            二维码预览区域
-          </div>
-        </div>
-      </div>
     </div>
-  </div>
 </template>
 ```
 
@@ -223,86 +199,84 @@ function handleLogoUpload(event: Event) {
 
 ```typescript
 // server/api/qrcode/generate.ts
-import { defineEventHandler } from 'h3'
-import QRCode from 'qrcode'
-import sharp from 'sharp'
+import { defineEventHandler } from "h3";
+import QRCode from "qrcode";
+import sharp from "sharp";
 
-import ReferenceAnswer from '@/components/common/ReferenceAnswer.vue';
+import ReferenceAnswer from "@/components/common/ReferenceAnswer.vue";
 
 export default defineEventHandler(async (event) => {
-  // 获取表单数据
-  const formData = await readMultipartFormData(event)
-  if (!formData) {
-    return {
-      success: false,
-      message: '请提供有效的表单数据'
+    // 获取表单数据
+    const formData = await readMultipartFormData(event);
+    if (!formData) {
+        return {
+            success: false,
+            message: "请提供有效的表单数据",
+        };
     }
-  }
-  
-  // 解析参数
-  const content = formData.find(f => f.name === 'content')?.data.toString()
-  const size = parseInt(formData.find(f => f.name === 'size')?.data.toString() || '200')
-  const foreground = formData.find(f => f.name === 'foreground')?.data.toString() || '#000000'
-  const background = formData.find(f => f.name === 'background')?.data.toString() || '#FFFFFF'
-  const logo = formData.find(f => f.name === 'logo')?.data
-  
-  if (!content) {
-    return {
-      success: false,
-      message: '请提供要转换的内容'
+
+    // 解析参数
+    const content = formData.find((f) => f.name === "content")?.data.toString();
+    const size = parseInt(formData.find((f) => f.name === "size")?.data.toString() || "200");
+    const foreground = formData.find((f) => f.name === "foreground")?.data.toString() || "#000000";
+    const background = formData.find((f) => f.name === "background")?.data.toString() || "#FFFFFF";
+    const logo = formData.find((f) => f.name === "logo")?.data;
+
+    if (!content) {
+        return {
+            success: false,
+            message: "请提供要转换的内容",
+        };
     }
-  }
-  
-  try {
-    // 生成二维码
-    const qrcode = await QRCode.toBuffer(content, {
-      errorCorrectionLevel: 'H',
-      margin: 1,
-      width: size,
-      color: {
-        dark: foreground,
-        light: background
-      }
-    })
-    
-    // 如果有 Logo，添加到二维码中心
-    if (logo) {
-      const logoSize = Math.floor(size * 0.2) // Logo 大小为二维码的 20%
-      const logoBuffer = await sharp(logo)
-        .resize(logoSize, logoSize)
-        .toBuffer()
-      
-      const qrcodeWithLogo = await sharp(qrcode)
-        .composite([
-          {
-            input: logoBuffer,
-            gravity: 'center'
-          }
-        ])
-        .toBuffer()
-      
-      return {
-        success: true,
-        result: {
-          url: `data:image/png;base64,${qrcodeWithLogo.toString('base64')}`
+
+    try {
+        // 生成二维码
+        const qrcode = await QRCode.toBuffer(content, {
+            errorCorrectionLevel: "H",
+            margin: 1,
+            width: size,
+            color: {
+                dark: foreground,
+                light: background,
+            },
+        });
+
+        // 如果有 Logo，添加到二维码中心
+        if (logo) {
+            const logoSize = Math.floor(size * 0.2); // Logo 大小为二维码的 20%
+            const logoBuffer = await sharp(logo).resize(logoSize, logoSize).toBuffer();
+
+            const qrcodeWithLogo = await sharp(qrcode)
+                .composite([
+                    {
+                        input: logoBuffer,
+                        gravity: "center",
+                    },
+                ])
+                .toBuffer();
+
+            return {
+                success: true,
+                result: {
+                    url: `data:image/png;base64,${qrcodeWithLogo.toString("base64")}`,
+                },
+            };
         }
-      }
+
+        return {
+            success: true,
+            result: {
+                url: `data:image/png;base64,${qrcode.toString("base64")}`,
+            },
+        };
+    } catch (error) {
+        console.error("生成二维码失败:", error);
+        return {
+            success: false,
+            message: "生成二维码失败，请重试",
+        };
     }
-    
-    return {
-      success: true,
-      result: {
-        url: `data:image/png;base64,${qrcode.toString('base64')}`
-      }
-    }
-  } catch (error) {
-    console.error('生成二维码失败:', error)
-    return {
-      success: false,
-      message: '生成二维码失败，请重试'
-    }
-  }
-})
+});
 ```
 
 ## 使用说明
@@ -325,19 +299,19 @@ npm install qrcode sharp
 ## 优化建议
 
 1. 性能优化
-   - 添加生成结果缓存
-   - 限制上传文件大小
-   - 压缩生成的二维码图片
+    - 添加生成结果缓存
+    - 限制上传文件大小
+    - 压缩生成的二维码图片
 
 2. 功能增强
-   - 支持批量生成
-   - 添加更多样式选项
-   - 支持生成动态二维码
+    - 支持批量生成
+    - 添加更多样式选项
+    - 支持生成动态二维码
 
 3. 用户体验
-   - 添加生成历史记录
-   - 支持拖拽上传 Logo
-   - 增加常用文本模板
+    - 添加生成历史记录
+    - 支持拖拽上传 Logo
+    - 增加常用文本模板
 
 ## 下一步
 

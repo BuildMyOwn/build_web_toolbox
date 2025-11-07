@@ -21,61 +21,63 @@ description: 实现网站的基础布局和响应式导航菜单
 以下是我的到的代码，供你参考：
 
 ```astro
-<!-- src/layouts/Layout.astro -->
 ---
-import '../app.css';
+import "../app.css";
 
 // 导航菜单项
 const menuItems = [
-  { name: '首页', path: '/' },
-  { name: '天气查询', path: '/weather' },
-  { name: '快递查询', path: '/express' },
-  { name: '二维码工具', path: '/tools/qrcode' },
-  { name: '汇率转换', path: '/tools/currency' }
-]
+    { name: "首页", path: "/" },
+    { name: "天气查询", path: "/weather" },
+    { name: "快递查询", path: "/express" },
+    { name: "二维码工具", path: "/tools/qrcode" },
+    { name: "汇率转换", path: "/tools/currency" },
+];
 ---
 
+<!-- src/layouts/Layout.astro -->
 <html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Web Toolbox - 您的在线工具箱">
-  <title>Web Toolbox</title>
-</head>
-<body>
-  <div class="min-h-screen bg-base-100 flex flex-col">
-    <!-- 导航栏 -->
-    <nav class="navbar bg-base-200">
-      <div class="navbar-start">
-        <!-- Logo -->
-        <a href="/" class="btn btn-ghost text-xl">Web Toolbox</a>
-      </div>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="Web Toolbox - 您的在线工具箱" />
+        <title>Web Toolbox</title>
+    </head>
+    <body>
+        <div class="bg-base-100 flex min-h-screen flex-col">
+            <!-- 导航栏 -->
+            <nav class="navbar bg-base-200">
+                <div class="navbar-start">
+                    <!-- Logo -->
+                    <a href="/" class="btn btn-ghost text-xl">Web Toolbox</a>
+                </div>
 
-      <!-- 导航菜单 -->
-      <div class="navbar-center">
-        <ul class="menu menu-horizontal px-1">
-          {menuItems.map(item => (
-            <li>
-              <a href={item.path}>{item.name}</a>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </nav>
+                <!-- 导航菜单 -->
+                <div class="navbar-center">
+                    <ul class="menu menu-horizontal px-1">
+                        {
+                            menuItems.map((item) => (
+                                <li>
+                                    <a href={item.path}>{item.name}</a>
+                                </li>
+                            ))
+                        }
+                    </ul>
+                </div>
+            </nav>
 
-    <!-- 主要内容 -->
-    <main class="container mx-auto px-4 py-8 flex-grow">
-      <slot />
-    </main>
+            <!-- 主要内容 -->
+            <main class="container mx-auto flex-grow px-4 py-8">
+                <slot />
+            </main>
 
-    <!-- 页脚 -->
-    <footer class="footer footer-center p-4 bg-base-200 text-base-content mt-auto">
-      <div>
-        <p>Copyright © 2024 - All rights reserved by Web Toolbox</p>
-      </div>
-    </footer>
-  </div>
-</body>
+            <!-- 页脚 -->
+            <footer class="footer footer-center bg-base-200 text-base-content mt-auto p-4">
+                <div>
+                    <p>Copyright © 2024 - All rights reserved by Web Toolbox</p>
+                </div>
+            </footer>
+        </div>
+    </body>
 </html>
 ```
 

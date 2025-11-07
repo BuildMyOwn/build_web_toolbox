@@ -8,16 +8,16 @@ description: 开发在线工具箱的图片处理功能，包括图片压缩、�
 在本节中，我们将实现在线工具箱的图片处理功能。主要包括以下功能点：
 
 - 图片压缩
-  - 支持多种图片格式
-  - 可调节压缩质量
-  - 批量处理功能
+    - 支持多种图片格式
+    - 可调节压缩质量
+    - 批量处理功能
 - 格式转换
-  - 支持 JPG、PNG、WebP 等格式互转
-  - 保持图片质量
+    - 支持 JPG、PNG、WebP 等格式互转
+    - 保持图片质量
 - 简单编辑
-  - 裁剪功能
-  - 旋转功能
-  - 调整尺寸
+    - 裁剪功能
+    - 旋转功能
+    - 调整尺寸
 
 ## 技术选型
 
@@ -35,67 +35,63 @@ description: 开发在线工具箱的图片处理功能，包括图片压缩、�
 ```vue
 <!-- pages/tools/image.vue -->
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useFileDialog } from '@vueuse/core'
+import { ref } from "vue";
+import { useFileDialog } from "@vueuse/core";
 
 // 文件选择相关
 const { files, open } = useFileDialog({
-  accept: 'image/*',
-  multiple: true
-})
+    accept: "image/*",
+    multiple: true,
+});
 
 // 选中的图片列表
-const selectedImages = ref<File[]>([])
+const selectedImages = ref<File[]>([]);
 
 // 监听文件选择
 watch(files, (newFiles) => {
-  if (newFiles) {
-    selectedImages.value = Array.from(newFiles)
-  }
-})
+    if (newFiles) {
+        selectedImages.value = Array.from(newFiles);
+    }
+});
 </script>
 
 <template>
-  <div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-8">图片处理工具</h1>
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="mb-8 text-3xl font-bold">图片处理工具</h1>
 
-    <!-- 工具选择 -->
-    <div class="tabs tabs-boxed mb-8">
-      <a class="tab tab-active">压缩</a>
-      <a class="tab">转换</a>
-      <a class="tab">编辑</a>
-    </div>
+        <!-- 工具选择 -->
+        <div class="tabs tabs-boxed mb-8">
+            <a class="tab tab-active">压缩</a>
+            <a class="tab">转换</a>
+            <a class="tab">编辑</a>
+        </div>
 
-    <!-- 图片上传区域 -->
-    <div
-      class="border-2 border-dashed border-base-300 rounded-lg p-8 text-center cursor-pointer"
-      @click="open()"
-      @drop.prevent="selectedImages = Array.from($event.dataTransfer?.files || [])"
-      @dragover.prevent
-    >
-      <div class="text-lg mb-4">
-        点击或拖拽图片到此处
-      </div>
-      <div class="text-sm text-base-content/60">
-        支持 JPG、PNG、WebP 等格式
-      </div>
-    </div>
-
-    <!-- 图片预览列表 -->
-    <div v-if="selectedImages.length" class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div
-        v-for="(image, index) in selectedImages"
-        :key="index"
-        class="relative aspect-square rounded-lg overflow-hidden"
-      >
-        <img
-          :src="URL.createObjectURL(image)"
-          class="w-full h-full object-cover"
-          @load="URL.revokeObjectURL($event.target.src)"
+        <!-- 图片上传区域 -->
+        <div
+            class="border-base-300 cursor-pointer rounded-lg border-2 border-dashed p-8 text-center"
+            @click="open()"
+            @drop.prevent="selectedImages = Array.from($event.dataTransfer?.files || [])"
+            @dragover.prevent
         >
-      </div>
+            <div class="mb-4 text-lg">点击或拖拽图片到此处</div>
+            <div class="text-base-content/60 text-sm">支持 JPG、PNG、WebP 等格式</div>
+        </div>
+
+        <!-- 图片预览列表 -->
+        <div v-if="selectedImages.length" class="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
+            <div
+                v-for="(image, index) in selectedImages"
+                :key="index"
+                class="relative aspect-square overflow-hidden rounded-lg"
+            >
+                <img
+                    :src="URL.createObjectURL(image)"
+                    class="h-full w-full object-cover"
+                    @load="URL.revokeObjectURL($event.target.src)"
+                />
+            </div>
+        </div>
     </div>
-  </div>
 </template>
 ```
 
@@ -111,69 +107,61 @@ npm install sharp @vueuse/core
 
 ```typescript
 // composables/useImageCompressor.ts
-import { ref } from 'vue'
-import sharp from 'sharp'
+import { ref } from "vue";
+import sharp from "sharp";
 
 export function useImageCompressor() {
-  const compressing = ref(false)
-  const progress = ref(0)
+    const compressing = ref(false);
+    const progress = ref(0);
 
-  const compressImage = async (file: File, quality: number = 80) => {
-    compressing.value = true
-    progress.value = 0
+    const compressImage = async (file: File, quality: number = 80) => {
+        compressing.value = true;
+        progress.value = 0;
 
-    try {
-      const buffer = await file.arrayBuffer()
-      const image = sharp(buffer)
+        try {
+            const buffer = await file.arrayBuffer();
+            const image = sharp(buffer);
 
-      // 获取图片信息
-      const metadata = await image.metadata()
+            // 获取图片信息
+            const metadata = await image.metadata();
 
-      // 根据原始格式选择压缩方法
-      let processed
-      switch (metadata.format) {
-        case 'jpeg':
-        case 'jpg':
-          processed = await image
-            .jpeg({ quality })
-            .toBuffer()
-          break
-        case 'png':
-          processed = await image
-            .png({ quality: quality / 100 })
-            .toBuffer()
-          break
-        case 'webp':
-          processed = await image
-            .webp({ quality })
-            .toBuffer()
-          break
-        default:
-          throw new Error(`不支持的格式: ${metadata.format}`)
-      }
+            // 根据原始格式选择压缩方法
+            let processed;
+            switch (metadata.format) {
+                case "jpeg":
+                case "jpg":
+                    processed = await image.jpeg({ quality }).toBuffer();
+                    break;
+                case "png":
+                    processed = await image.png({ quality: quality / 100 }).toBuffer();
+                    break;
+                case "webp":
+                    processed = await image.webp({ quality }).toBuffer();
+                    break;
+                default:
+                    throw new Error(`不支持的格式: ${metadata.format}`);
+            }
 
-      // 创建压缩后的文件
-      const compressedFile = new File(
-        [processed],
-        `compressed_${file.name}`,
-        { type: file.type }
-      )
+            // 创建压缩后的文件
+            const compressedFile = new File([processed], `compressed_${file.name}`, {
+                type: file.type,
+            });
 
-      progress.value = 100
-      return compressedFile
-    } catch (error) {
-      console.error('压缩失败:', error)
-      throw error
-    } finally {
-      compressing.value = false
-    }
-  }
+            progress.value = 100;
+            return compressedFile;
+        } catch (error) {
+            console.error("压缩失败:", error);
+            throw error;
+        } finally {
+            compressing.value = false;
+        }
+    };
 
-  return {
-    compressing,
-    progress,
-    compressImage
-  }
+    return {
+        compressing,
+        progress,
+        compressImage,
+    };
 }
 ```
 
@@ -183,67 +171,57 @@ export function useImageCompressor() {
 
 ```typescript
 // composables/useImageConverter.ts
-import { ref } from 'vue'
-import sharp from 'sharp'
+import { ref } from "vue";
+import sharp from "sharp";
 
 export function useImageConverter() {
-  const converting = ref(false)
+    const converting = ref(false);
 
-  const convertImage = async (
-    file: File,
-    format: 'jpeg' | 'png' | 'webp',
-    options: sharp.OutputOptions = {}
-  ) => {
-    converting.value = true
+    const convertImage = async (
+        file: File,
+        format: "jpeg" | "png" | "webp",
+        options: sharp.OutputOptions = {},
+    ) => {
+        converting.value = true;
 
-    try {
-      const buffer = await file.arrayBuffer()
-      const image = sharp(buffer)
+        try {
+            const buffer = await file.arrayBuffer();
+            const image = sharp(buffer);
 
-      // 转换格式
-      let processed
-      switch (format) {
-        case 'jpeg':
-          processed = await image
-            .jpeg(options)
-            .toBuffer()
-          break
-        case 'png':
-          processed = await image
-            .png(options)
-            .toBuffer()
-          break
-        case 'webp':
-          processed = await image
-            .webp(options)
-            .toBuffer()
-          break
-      }
+            // 转换格式
+            let processed;
+            switch (format) {
+                case "jpeg":
+                    processed = await image.jpeg(options).toBuffer();
+                    break;
+                case "png":
+                    processed = await image.png(options).toBuffer();
+                    break;
+                case "webp":
+                    processed = await image.webp(options).toBuffer();
+                    break;
+            }
 
-      // 确定新文件的扩展名
-      const ext = format === 'jpeg' ? 'jpg' : format
-      const newName = file.name.replace(/\.[^.]+$/, `.${ext}`)
+            // 确定新文件的扩展名
+            const ext = format === "jpeg" ? "jpg" : format;
+            const newName = file.name.replace(/\.[^.]+$/, `.${ext}`);
 
-      // 创建转换后的文件
-      const convertedFile = new File(
-        [processed],
-        newName,
-        { type: `image/${format}` }
-      )
+            // 创建转换后的文件
+            const convertedFile = new File([processed], newName, { type: `image/${format}` });
 
-      return convertedFile
-    } catch (error) {
-      console.error('转换失败:', error)
-      throw error
-    } finally {
-      converting.value = false
-    }
-  }
+            return convertedFile;
+        } catch (error) {
+            console.error("转换失败:", error);
+            throw error;
+        } finally {
+            converting.value = false;
+        }
+    };
 
-  return {
-    converting,
-    convertImage
-  }
+    return {
+        converting,
+        convertImage,
+    };
 }
 ```
 
@@ -253,82 +231,80 @@ export function useImageConverter() {
 
 ```typescript
 // composables/useImageEditor.ts
-import { ref, computed } from 'vue'
+import { ref, computed } from "vue";
 
 export function useImageEditor() {
-  const canvas = ref<HTMLCanvasElement | null>(null)
-  const ctx = computed(() => canvas.value?.getContext('2d'))
+    const canvas = ref<HTMLCanvasElement | null>(null);
+    const ctx = computed(() => canvas.value?.getContext("2d"));
 
-  // 图片旋转
-  const rotateImage = (degree: number) => {
-    if (!canvas.value || !ctx.value) return
+    // 图片旋转
+    const rotateImage = (degree: number) => {
+        if (!canvas.value || !ctx.value) return;
 
-    const { width, height } = canvas.value
-    
-    // 保存当前画布内容
-    const imageData = ctx.value.getImageData(0, 0, width, height)
-    
-    // 调整画布大小
-    if (degree === 90 || degree === 270) {
-      canvas.value.width = height
-      canvas.value.height = width
-    }
-    
-    // 执行旋转
-    ctx.value.save()
-    ctx.value.translate(canvas.value.width / 2, canvas.value.height / 2)
-    ctx.value.rotate((degree * Math.PI) / 180)
-    ctx.value.drawImage(
-      canvas.value,
-      -width / 2,
-      -height / 2
-    )
-    ctx.value.restore()
-  }
+        const { width, height } = canvas.value;
 
-  // 图片裁剪
-  const cropImage = (x: number, y: number, width: number, height: number) => {
-    if (!canvas.value || !ctx.value) return
+        // 保存当前画布内容
+        const imageData = ctx.value.getImageData(0, 0, width, height);
 
-    const imageData = ctx.value.getImageData(x, y, width, height)
-    canvas.value.width = width
-    canvas.value.height = height
-    ctx.value.putImageData(imageData, 0, 0)
-  }
+        // 调整画布大小
+        if (degree === 90 || degree === 270) {
+            canvas.value.width = height;
+            canvas.value.height = width;
+        }
 
-  // 调整尺寸
-  const resizeImage = (width: number, height: number) => {
-    if (!canvas.value || !ctx.value) return
+        // 执行旋转
+        ctx.value.save();
+        ctx.value.translate(canvas.value.width / 2, canvas.value.height / 2);
+        ctx.value.rotate((degree * Math.PI) / 180);
+        ctx.value.drawImage(canvas.value, -width / 2, -height / 2);
+        ctx.value.restore();
+    };
 
-    const tempCanvas = document.createElement('canvas')
-    tempCanvas.width = canvas.value.width
-    tempCanvas.height = canvas.value.height
-    const tempCtx = tempCanvas.getContext('2d')
-    
-    if (!tempCtx) return
-    
-    tempCtx.drawImage(canvas.value, 0, 0)
-    
-    canvas.value.width = width
-    canvas.value.height = height
-    
-    ctx.value.drawImage(
-      tempCanvas,
-      0, 0,
-      tempCanvas.width,
-      tempCanvas.height,
-      0, 0,
-      width,
-      height
-    )
-  }
+    // 图片裁剪
+    const cropImage = (x: number, y: number, width: number, height: number) => {
+        if (!canvas.value || !ctx.value) return;
 
-  return {
-    canvas,
-    rotateImage,
-    cropImage,
-    resizeImage
-  }
+        const imageData = ctx.value.getImageData(x, y, width, height);
+        canvas.value.width = width;
+        canvas.value.height = height;
+        ctx.value.putImageData(imageData, 0, 0);
+    };
+
+    // 调整尺寸
+    const resizeImage = (width: number, height: number) => {
+        if (!canvas.value || !ctx.value) return;
+
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = canvas.value.width;
+        tempCanvas.height = canvas.value.height;
+        const tempCtx = tempCanvas.getContext("2d");
+
+        if (!tempCtx) return;
+
+        tempCtx.drawImage(canvas.value, 0, 0);
+
+        canvas.value.width = width;
+        canvas.value.height = height;
+
+        ctx.value.drawImage(
+            tempCanvas,
+            0,
+            0,
+            tempCanvas.width,
+            tempCanvas.height,
+            0,
+            0,
+            width,
+            height,
+        );
+    };
+
+    return {
+        canvas,
+        rotateImage,
+        cropImage,
+        resizeImage,
+    };
 }
 ```
 
@@ -337,95 +313,76 @@ export function useImageEditor() {
 ```vue
 <!-- components/ImageProcessor.vue -->
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useImageCompressor } from '~/composables/useImageCompressor'
-import { useImageConverter } from '~/composables/useImageConverter'
-import { useImageEditor } from '~/composables/useImageEditor'
+import { ref } from "vue";
+import { useImageCompressor } from "~/composables/useImageCompressor";
+import { useImageConverter } from "~/composables/useImageConverter";
+import { useImageEditor } from "~/composables/useImageEditor";
 
-const { compressing, progress, compressImage } = useImageCompressor()
-const { converting, convertImage } = useImageConverter()
-const { canvas, rotateImage, cropImage, resizeImage } = useImageEditor()
+const { compressing, progress, compressImage } = useImageCompressor();
+const { converting, convertImage } = useImageConverter();
+const { canvas, rotateImage, cropImage, resizeImage } = useImageEditor();
 
 // 压缩质量设置
-const quality = ref(80)
+const quality = ref(80);
 
 // 目标格式设置
-const targetFormat = ref<'jpeg' | 'png' | 'webp'>('jpeg')
+const targetFormat = ref<"jpeg" | "png" | "webp">("jpeg");
 
 // 处理压缩
 const handleCompress = async (file: File) => {
-  try {
-    const compressed = await compressImage(file, quality.value)
-    // 处理压缩后的文件...
-  } catch (error) {
-    console.error('压缩失败:', error)
-  }
-}
+    try {
+        const compressed = await compressImage(file, quality.value);
+        // 处理压缩后的文件...
+    } catch (error) {
+        console.error("压缩失败:", error);
+    }
+};
 
 // 处理转换
 const handleConvert = async (file: File) => {
-  try {
-    const converted = await convertImage(file, targetFormat.value)
-    // 处理转换后的文件...
-  } catch (error) {
-    console.error('转换失败:', error)
-  }
-}
+    try {
+        const converted = await convertImage(file, targetFormat.value);
+        // 处理转换后的文件...
+    } catch (error) {
+        console.error("转换失败:", error);
+    }
+};
 </script>
 
 <template>
-  <div class="space-y-8">
-    <!-- 压缩设置 -->
-    <div class="form-control">
-      <label class="label">
-        <span class="label-text">压缩质量</span>
-        <span class="label-text-alt">{{ quality }}%</span>
-      </label>
-      <input
-        v-model="quality"
-        type="range"
-        min="0"
-        max="100"
-        class="range"
-      >
-    </div>
+    <div class="space-y-8">
+        <!-- 压缩设置 -->
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">压缩质量</span>
+                <span class="label-text-alt">{{ quality }}%</span>
+            </label>
+            <input v-model="quality" type="range" min="0" max="100" class="range" />
+        </div>
 
-    <!-- 格式选择 -->
-    <div class="form-control">
-      <label class="label">
-        <span class="label-text">目标格式</span>
-      </label>
-      <select v-model="targetFormat" class="select select-bordered">
-        <option value="jpeg">JPG</option>
-        <option value="png">PNG</option>
-        <option value="webp">WebP</option>
-      </select>
-    </div>
+        <!-- 格式选择 -->
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">目标格式</span>
+            </label>
+            <select v-model="targetFormat" class="select select-bordered">
+                <option value="jpeg">JPG</option>
+                <option value="png">PNG</option>
+                <option value="webp">WebP</option>
+            </select>
+        </div>
 
-    <!-- 编辑工具栏 -->
-    <div class="btn-group">
-      <button
-        class="btn"
-        @click="rotateImage(-90)"
-      >
-        向左旋转
-      </button>
-      <button
-        class="btn"
-        @click="rotateImage(90)"
-      >
-        向右旋转
-      </button>
-    </div>
+        <!-- 编辑工具栏 -->
+        <div class="btn-group">
+            <button class="btn" @click="rotateImage(-90)">向左旋转</button>
+            <button class="btn" @click="rotateImage(90)">向右旋转</button>
+        </div>
 
-    <!-- 画布容器 -->
-    <div class="relative aspect-video bg-base-200 rounded-lg overflow-hidden">
-      <canvas
-        ref="canvas"
-        class="w-full h-full object-contain"
-      />
+        <!-- 画布容器 -->
+        <div class="bg-base-200 relative aspect-video overflow-hidden rounded-lg">
+            <canvas ref="canvas" class="h-full w-full object-contain" />
+        </div>
     </div>
-  </div>
 </template>
 ```
 
@@ -459,3 +416,4 @@ self.addEventListener('message', async (e) => {
         result = await image[options.format](options)
           .toBuffer()
         break
+```

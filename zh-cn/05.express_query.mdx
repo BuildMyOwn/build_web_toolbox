@@ -15,7 +15,6 @@ description: 实现快递查询页面、快递信息展示组件和查询历史�
 ## 准备工作
 
 1. 注册聚合数据账号并获取 API Key：
-
     - 访问 [聚合数据官网](https://www.juhe.cn/)
     - 注册账号并实名认证
     - 申请全国快递物流查询 API
@@ -35,7 +34,7 @@ JUHE_EXPRESS_KEY=your_api_key_here
 ```vue
 <!-- components/ExpressCard.vue -->
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed } from "vue";
 
 // 定义组件属性
 interface Props {
@@ -57,33 +56,33 @@ const props = defineProps<Props>();
 // 根据快递状态选择图标和颜色
 const statusInfo = computed(() => {
     const status = props.info.status;
-    if (status === '已签收') {
+    if (status === "已签收") {
         return {
-            icon: '✅',
-            color: 'text-success',
+            icon: "✅",
+            color: "text-success",
         };
     }
-    if (status === '运输中') {
+    if (status === "运输中") {
         return {
-            icon: '🚚',
-            color: 'text-info',
+            icon: "🚚",
+            color: "text-info",
         };
     }
     return {
-        icon: '📦',
-        color: 'text-warning',
+        icon: "📦",
+        color: "text-warning",
     };
 });
 </script>
 
 <template>
-    <div class="card w-full bg-base-200 shadow-xl">
+    <div class="card bg-base-200 w-full shadow-xl">
         <div class="card-body">
-            <h2 class="card-title text-2xl flex justify-between">
+            <h2 class="card-title flex justify-between text-2xl">
                 <span>{{ info.company }}</span>
                 <span :class="statusInfo.color"> {{ statusInfo.icon }} {{ info.status }} </span>
             </h2>
-            <p class="text-lg mb-4">运单号：{{ info.number }}</p>
+            <p class="mb-4 text-lg">运单号：{{ info.number }}</p>
 
             <!-- 物流信息时间线 -->
             <ul class="timeline timeline-vertical">
@@ -93,7 +92,7 @@ const statusInfo = computed(() => {
                             xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 20 20"
                             fill="currentColor"
-                            class="w-5 h-5"
+                            class="h-5 w-5"
                         >
                             <path
                                 fill-rule="evenodd"
@@ -102,10 +101,10 @@ const statusInfo = computed(() => {
                             />
                         </svg>
                     </div>
-                    <div class="timeline-start md:text-end mb-10">
+                    <div class="timeline-start mb-10 md:text-end">
                         <time class="font-mono">{{ item.datetime }}</time>
                         <div class="text-lg">{{ item.remark }}</div>
-                        <div class="text-sm text-base-content/60">{{ item.zone }}</div>
+                        <div class="text-base-content/60 text-sm">{{ item.zone }}</div>
                     </div>
                     <hr />
                 </li>
@@ -122,13 +121,13 @@ const statusInfo = computed(() => {
 ```vue
 <!-- pages/express/index.vue -->
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted } from "vue";
 
 // 查询表单
-const company = ref('');
-const number = ref('');
+const company = ref("");
+const number = ref("");
 const loading = ref(false);
-const error = ref('');
+const error = ref("");
 
 // 快递信息
 const expressInfo = ref<any>(null);
@@ -144,19 +143,19 @@ const history = ref<
 
 // 快递公司列表
 const companies = [
-    { name: '顺丰速运', code: 'SF' },
-    { name: '中通快递', code: 'ZTO' },
-    { name: '圆通速递', code: 'YTO' },
-    { name: '韵达速递', code: 'YD' },
-    { name: '申通快递', code: 'STO' },
-    { name: '百世快递', code: 'HTKY' },
-    { name: 'EMS', code: 'EMS' },
-    { name: '京东物流', code: 'JD' },
+    { name: "顺丰速运", code: "SF" },
+    { name: "中通快递", code: "ZTO" },
+    { name: "圆通速递", code: "YTO" },
+    { name: "韵达速递", code: "YD" },
+    { name: "申通快递", code: "STO" },
+    { name: "百世快递", code: "HTKY" },
+    { name: "EMS", code: "EMS" },
+    { name: "京东物流", code: "JD" },
 ];
 
 // 加载查询历史
 onMounted(() => {
-    const savedHistory = localStorage.getItem('express_history');
+    const savedHistory = localStorage.getItem("express_history");
     if (savedHistory) {
         history.value = JSON.parse(savedHistory);
     }
@@ -167,30 +166,30 @@ function saveHistory(companyName: string, expressNumber: string) {
     const newRecord = {
         company: companyName,
         number: expressNumber,
-        time: new Date().toLocaleString('zh-CN'),
+        time: new Date().toLocaleString("zh-CN"),
     };
 
     history.value = [newRecord, ...history.value.slice(0, 9)];
-    localStorage.setItem('express_history', JSON.stringify(history.value));
+    localStorage.setItem("express_history", JSON.stringify(history.value));
 }
 
 // 查询快递信息
 async function queryExpress() {
     if (!company.value || !number.value) {
-        error.value = '请选择快递公司并输入运单号';
+        error.value = "请选择快递公司并输入运单号";
         return;
     }
 
     try {
         loading.value = true;
-        error.value = '';
+        error.value = "";
         expressInfo.value = null;
 
         // 调用快递查询 API
-        const response = await fetch('/api/express/query', {
-            method: 'POST',
+        const response = await fetch("/api/express/query", {
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
             },
             body: JSON.stringify({
                 company: company.value,
@@ -206,10 +205,10 @@ async function queryExpress() {
         }
 
         expressInfo.value = data;
-        const companyName = companies.find(c => c.code === company.value)?.name || company.value;
+        const companyName = companies.find((c) => c.code === company.value)?.name || company.value;
         saveHistory(companyName, number.value);
     } catch (e) {
-        error.value = '查询失败，请稍后重试';
+        error.value = "查询失败，请稍后重试";
     } finally {
         loading.value = false;
     }
@@ -217,7 +216,7 @@ async function queryExpress() {
 
 // 从历史记录中查询
 function queryFromHistory(record: (typeof history.value)[0]) {
-    company.value = companies.find(c => c.name === record.company)?.code || '';
+    company.value = companies.find((c) => c.name === record.company)?.code || "";
     number.value = record.number;
     queryExpress();
 }
@@ -225,17 +224,17 @@ function queryFromHistory(record: (typeof history.value)[0]) {
 // 清空历史记录
 function clearHistory() {
     history.value = [];
-    localStorage.removeItem('express_history');
+    localStorage.removeItem("express_history");
 }
 </script>
 
 <template>
-    <div class="max-w-4xl mx-auto">
-        <h1 class="text-3xl font-bold mb-8">快递查询</h1>
+    <div class="mx-auto max-w-4xl">
+        <h1 class="mb-8 text-3xl font-bold">快递查询</h1>
 
         <!-- 查询表单 -->
-        <div class="form-control w-full max-w-lg mb-8">
-            <div class="flex gap-4 mb-4">
+        <div class="form-control mb-8 w-full max-w-lg">
+            <div class="mb-4 flex gap-4">
                 <select v-model="company" class="select select-bordered w-full max-w-xs">
                     <option value="">选择快递公司</option>
                     <option v-for="item in companies" :key="item.code" :value="item.code">
@@ -263,13 +262,13 @@ function clearHistory() {
 
         <!-- 查询历史 -->
         <div v-if="history.length > 0" class="mb-8">
-            <div class="flex justify-between items-center mb-4">
+            <div class="mb-4 flex items-center justify-between">
                 <h2 class="text-xl font-bold">查询历史</h2>
                 <button class="btn btn-sm btn-ghost" @click="clearHistory">清空</button>
             </div>
 
             <div class="overflow-x-auto">
-                <table class="table table-zebra">
+                <table class="table-zebra table">
                     <thead>
                         <tr>
                             <th>快递公司</th>
@@ -303,7 +302,7 @@ function clearHistory() {
         </div>
 
         <!-- 加载状态 -->
-        <div v-if="loading" class="flex justify-center items-center h-40">
+        <div v-if="loading" class="flex h-40 items-center justify-center">
             <span class="loading loading-spinner loading-lg"></span>
         </div>
     </div>
@@ -316,32 +315,32 @@ function clearHistory() {
 
 ```typescript
 // server/api/express/query.ts
-import { defineEventHandler, readBody } from 'h3';
+import { defineEventHandler, readBody } from "h3";
 
-import ReferenceAnswer from '@/components/common/ReferenceAnswer.vue';
+import ReferenceAnswer from "@/components/common/ReferenceAnswer.vue";
 
-export default defineEventHandler(async event => {
+export default defineEventHandler(async (event) => {
     try {
         const body = await readBody(event);
         const { company, number } = body;
 
         if (!company || !number) {
             return {
-                error: '请提供快递公司和运单号',
+                error: "请提供快递公司和运单号",
             };
         }
 
         // 调用聚合数据快递 API
         const apiKey = process.env.JUHE_EXPRESS_KEY;
         const response = await fetch(
-            `http://apis.juhe.cn/exp/index?com=${company}&no=${number}&key=${apiKey}`
+            `http://apis.juhe.cn/exp/index?com=${company}&no=${number}&key=${apiKey}`,
         );
 
         const data = await response.json();
 
         if (data.error_code !== 0) {
             return {
-                error: data.reason || '获取快递信息失败',
+                error: data.reason || "获取快递信息失败",
             };
         }
 
@@ -354,9 +353,9 @@ export default defineEventHandler(async event => {
             isComplete: data.result.isComplete,
         };
     } catch (error) {
-        console.error('Express API Error:', error);
+        console.error("Express API Error:", error);
         return {
-            error: '服务器错误，请稍后重试',
+            error: "服务器错误，请稍后重试",
         };
     }
 });
@@ -365,13 +364,11 @@ export default defineEventHandler(async event => {
 ## 使用说明
 
 1. 查询快递信息：
-
     - 从下拉列表选择快递公司
     - 输入运单号
     - 点击查询按钮
 
 2. 查询历史功能：
-
     - 自动保存最近 10 条查询记录
     - 支持从历史记录中重新查询
     - 可以清空历史记录
@@ -385,12 +382,10 @@ export default defineEventHandler(async event => {
 ## 优化建议
 
 1. 数据验证
-
     - 添加运单号格式验证
     - 支持扫描运单号二维码
 
 2. 用户体验
-
     - 添加运单号自动识别快递公司功能
     - 支持订阅物流更新提醒
     - 添加常用运单号收藏功能

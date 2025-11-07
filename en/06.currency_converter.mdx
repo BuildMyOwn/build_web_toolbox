@@ -19,124 +19,113 @@ description: 开发在线工具箱的汇率转换功能，包括实时汇率查�
 ```vue
 <!-- pages/tools/currency.vue -->
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import type { Currency } from '~/types'
+import { ref, computed } from "vue";
+import type { Currency } from "~/types";
 
 // 币种列表
 const currencies = ref<Currency[]>([
-  { code: 'CNY', name: '人民币' },
-  { code: 'USD', name: '美元' },
-  { code: 'EUR', name: '欧元' },
-  { code: 'JPY', name: '日元' },
-  { code: 'GBP', name: '英镑' },
-  // 更多币种...
-])
+    { code: "CNY", name: "人民币" },
+    { code: "USD", name: "美元" },
+    { code: "EUR", name: "欧元" },
+    { code: "JPY", name: "日元" },
+    { code: "GBP", name: "英镑" },
+    // 更多币种...
+]);
 
 // 表单数据
 const form = ref({
-  amount: 100,
-  fromCurrency: 'CNY',
-  toCurrency: 'USD'
-})
+    amount: 100,
+    fromCurrency: "CNY",
+    toCurrency: "USD",
+});
 
 // 转换结果
-const result = ref<number | null>(null)
+const result = ref<number | null>(null);
 </script>
 
 <template>
-  <div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-8">汇率转换</h1>
-    
-    <!-- 转换表单 -->
-    <div class="card bg-base-100 shadow-xl">
-      <div class="card-body">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <!-- 金额输入 -->
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text">金额</span>
-            </label>
-            <input
-              v-model="form.amount"
-              type="number"
-              class="input input-bordered"
-              min="0"
-              step="0.01"
-            />
-          </div>
-          
-          <!-- 源币种选择 -->
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text">从</span>
-            </label>
-            <select
-              v-model="form.fromCurrency"
-              class="select select-bordered"
-            >
-              <option
-                v-for="currency in currencies"
-                :key="currency.code"
-                :value="currency.code"
-              >
-                {{ currency.name }} ({{ currency.code }})
-              </option>
-            </select>
-          </div>
-          
-          <!-- 目标币种选择 -->
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text">到</span>
-            </label>
-            <select
-              v-model="form.toCurrency"
-              class="select select-bordered"
-            >
-              <option
-                v-for="currency in currencies"
-                :key="currency.code"
-                :value="currency.code"
-              >
-                {{ currency.name }} ({{ currency.code }})
-              </option>
-            </select>
-          </div>
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="mb-8 text-3xl font-bold">汇率转换</h1>
+
+        <!-- 转换表单 -->
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+                    <!-- 金额输入 -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">金额</span>
+                        </label>
+                        <input
+                            v-model="form.amount"
+                            type="number"
+                            class="input input-bordered"
+                            min="0"
+                            step="0.01"
+                        />
+                    </div>
+
+                    <!-- 源币种选择 -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">从</span>
+                        </label>
+                        <select v-model="form.fromCurrency" class="select select-bordered">
+                            <option
+                                v-for="currency in currencies"
+                                :key="currency.code"
+                                :value="currency.code"
+                            >
+                                {{ currency.name }} ({{ currency.code }})
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- 目标币种选择 -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">到</span>
+                        </label>
+                        <select v-model="form.toCurrency" class="select select-bordered">
+                            <option
+                                v-for="currency in currencies"
+                                :key="currency.code"
+                                :value="currency.code"
+                            >
+                                {{ currency.name }} ({{ currency.code }})
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 转换按钮 -->
+                <div class="mt-6">
+                    <button class="btn btn-primary" @click="handleConvert">转换</button>
+                </div>
+
+                <!-- 转换结果 -->
+                <div v-if="result" class="mt-6">
+                    <div class="text-xl">
+                        {{ form.amount }} {{ form.fromCurrency }} = {{ result.toFixed(2) }}
+                        {{ form.toCurrency }}
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <!-- 转换按钮 -->
-        <div class="mt-6">
-          <button
-            class="btn btn-primary"
-            @click="handleConvert"
-          >
-            转换
-          </button>
+
+        <!-- 历史走势图 -->
+        <div class="mt-8">
+            <h2 class="mb-4 text-2xl font-bold">历史走势</h2>
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body">
+                    <CurrencyChart
+                        :from-currency="form.fromCurrency"
+                        :to-currency="form.toCurrency"
+                    />
+                </div>
+            </div>
         </div>
-        
-        <!-- 转换结果 -->
-        <div v-if="result" class="mt-6">
-          <div class="text-xl">
-            {{ form.amount }} {{ form.fromCurrency }} =
-            {{ result.toFixed(2) }} {{ form.toCurrency }}
-          </div>
-        </div>
-      </div>
     </div>
-    
-    <!-- 历史走势图 -->
-    <div class="mt-8">
-      <h2 class="text-2xl font-bold mb-4">历史走势</h2>
-      <div class="card bg-base-100 shadow-xl">
-        <div class="card-body">
-          <CurrencyChart
-            :from-currency="form.fromCurrency"
-            :to-currency="form.toCurrency"
-          />
-        </div>
-      </div>
-    </div>
-  </div>
 </template>
 ```
 
@@ -145,20 +134,20 @@ const result = ref<number | null>(null)
 ```typescript
 // types/currency.ts
 export interface Currency {
-  code: string
-  name: string
+    code: string;
+    name: string;
 }
 
 export interface ExchangeRate {
-  from: string
-  to: string
-  rate: number
-  timestamp: number
+    from: string;
+    to: string;
+    rate: number;
+    timestamp: number;
 }
 
 export interface HistoricalRate {
-  date: string
-  rate: number
+    date: string;
+    rate: number;
 }
 ```
 
@@ -166,78 +155,80 @@ export interface HistoricalRate {
 
 ```typescript
 // composables/useCurrency.ts
-import { ref } from 'vue'
-import type { ExchangeRate, HistoricalRate } from '~/types'
+import { ref } from "vue";
+import type { ExchangeRate, HistoricalRate } from "~/types";
 
 export function useCurrency() {
-  const loading = ref(false)
-  const error = ref<string | null>(null)
-  
-  // 获取实时汇率
-  async function getExchangeRate(
-    fromCurrency: string,
-    toCurrency: string
-  ): Promise<ExchangeRate | null> {
-    loading.value = true
-    error.value = null
-    
-    try {
-      // 调用聚合数据汇率 API
-      const response = await fetch(`/api/currency/rate?from=${fromCurrency}&to=${toCurrency}`)
-      const data = await response.json()
-      
-      if (!data.success) {
-        throw new Error(data.message)
-      }
-      
-      return {
-        from: fromCurrency,
-        to: toCurrency,
-        rate: data.result.rate,
-        timestamp: data.result.timestamp
-      }
-    } catch (e) {
-      error.value = e.message
-      return null
-    } finally {
-      loading.value = false
+    const loading = ref(false);
+    const error = ref<string | null>(null);
+
+    // 获取实时汇率
+    async function getExchangeRate(
+        fromCurrency: string,
+        toCurrency: string,
+    ): Promise<ExchangeRate | null> {
+        loading.value = true;
+        error.value = null;
+
+        try {
+            // 调用聚合数据汇率 API
+            const response = await fetch(
+                `/api/currency/rate?from=${fromCurrency}&to=${toCurrency}`,
+            );
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.message);
+            }
+
+            return {
+                from: fromCurrency,
+                to: toCurrency,
+                rate: data.result.rate,
+                timestamp: data.result.timestamp,
+            };
+        } catch (e) {
+            error.value = e.message;
+            return null;
+        } finally {
+            loading.value = false;
+        }
     }
-  }
-  
-  // 获取历史汇率数据
-  async function getHistoricalRates(
-    fromCurrency: string,
-    toCurrency: string,
-    days: number = 30
-  ): Promise<HistoricalRate[]> {
-    loading.value = true
-    error.value = null
-    
-    try {
-      const response = await fetch(
-        `/api/currency/history?from=${fromCurrency}&to=${toCurrency}&days=${days}`
-      )
-      const data = await response.json()
-      
-      if (!data.success) {
-        throw new Error(data.message)
-      }
-      
-      return data.result.rates
-    } catch (e) {
-      error.value = e.message
-      return []
-    } finally {
-      loading.value = false
+
+    // 获取历史汇率数据
+    async function getHistoricalRates(
+        fromCurrency: string,
+        toCurrency: string,
+        days: number = 30,
+    ): Promise<HistoricalRate[]> {
+        loading.value = true;
+        error.value = null;
+
+        try {
+            const response = await fetch(
+                `/api/currency/history?from=${fromCurrency}&to=${toCurrency}&days=${days}`,
+            );
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.message);
+            }
+
+            return data.result.rates;
+        } catch (e) {
+            error.value = e.message;
+            return [];
+        } finally {
+            loading.value = false;
+        }
     }
-  }
-  
-  return {
-    loading,
-    error,
-    getExchangeRate,
-    getHistoricalRates
-  }
+
+    return {
+        loading,
+        error,
+        getExchangeRate,
+        getHistoricalRates,
+    };
 }
 ```
 
@@ -246,77 +237,65 @@ export function useCurrency() {
 ```vue
 <!-- components/CurrencyChart.vue -->
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
-import { Line } from 'vue-chartjs'
-import type { HistoricalRate } from '~/types'
+import { ref, onMounted, watch } from "vue";
+import { Line } from "vue-chartjs";
+import type { HistoricalRate } from "~/types";
 
 const props = defineProps<{
-  fromCurrency: string
-  toCurrency: string
-}>()
+    fromCurrency: string;
+    toCurrency: string;
+}>();
 
-const { getHistoricalRates } = useCurrency()
-const chartData = ref<HistoricalRate[]>([])
+const { getHistoricalRates } = useCurrency();
+const chartData = ref<HistoricalRate[]>([]);
 
 async function loadChartData() {
-  chartData.value = await getHistoricalRates(
-    props.fromCurrency,
-    props.toCurrency
-  )
+    chartData.value = await getHistoricalRates(props.fromCurrency, props.toCurrency);
 }
 
 // 监听币种变化，重新加载数据
-watch(
-  [() => props.fromCurrency, () => props.toCurrency],
-  () => loadChartData(),
-  { immediate: true }
-)
+watch([() => props.fromCurrency, () => props.toCurrency], () => loadChartData(), {
+    immediate: true,
+});
 
 // 图表配置
 const chartConfig = computed(() => ({
-  type: 'line',
-  data: {
-    labels: chartData.value.map(item => item.date),
-    datasets: [
-      {
-        label: `${props.fromCurrency}/${props.toCurrency} 汇率`,
-        data: chartData.value.map(item => item.rate),
-        borderColor: '#3b82f6',
-        tension: 0.1
-      }
-    ]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: 'top'
-      }
+    type: "line",
+    data: {
+        labels: chartData.value.map((item) => item.date),
+        datasets: [
+            {
+                label: `${props.fromCurrency}/${props.toCurrency} 汇率`,
+                data: chartData.value.map((item) => item.rate),
+                borderColor: "#3b82f6",
+                tension: 0.1,
+            },
+        ],
     },
-    scales: {
-      y: {
-        beginAtZero: false
-      }
-    }
-  }
-}))
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: "top",
+            },
+        },
+        scales: {
+            y: {
+                beginAtZero: false,
+            },
+        },
+    },
+}));
 </script>
 
 <template>
-  <div class="h-[400px]">
-    <Line
-      v-if="chartData.length > 0"
-      :data="chartConfig.data"
-      :options="chartConfig.options"
-    />
-    <div
-      v-else
-      class="flex items-center justify-center h-full"
-    >
-      <span class="loading loading-spinner loading-lg"></span>
+    <div class="h-[400px]">
+        <Line v-if="chartData.length > 0" :data="chartConfig.data" :options="chartConfig.options" />
+        <div v-else class="flex h-full items-center justify-center">
+            <span class="loading loading-spinner loading-lg"></span>
+        </div>
     </div>
-  </div>
 </template>
 ```
 
@@ -324,46 +303,46 @@ const chartConfig = computed(() => ({
 
 ```typescript
 // server/api/currency/rate.ts
-import { defineEventHandler } from 'h3'
+import { defineEventHandler } from "h3";
 
-import ReferenceAnswer from '@/components/common/ReferenceAnswer.vue';
+import ReferenceAnswer from "@/components/common/ReferenceAnswer.vue";
 
 export default defineEventHandler(async (event) => {
-  const query = getQuery(event)
-  const { from, to } = query
-  
-  if (!from || !to) {
-    return {
-      success: false,
-      message: '请提供源币种和目标币种'
+    const query = getQuery(event);
+    const { from, to } = query;
+
+    if (!from || !to) {
+        return {
+            success: false,
+            message: "请提供源币种和目标币种",
+        };
     }
-  }
-  
-  try {
-    // 调用聚合数据 API
-    const response = await fetch(
-      `http://apis.juhe.cn/fapig/currency/exchange?from=${from}&to=${to}&key=${process.env.JUHE_API_KEY}`
-    )
-    const data = await response.json()
-    
-    if (data.error_code !== 0) {
-      throw new Error(data.reason)
+
+    try {
+        // 调用聚合数据 API
+        const response = await fetch(
+            `http://apis.juhe.cn/fapig/currency/exchange?from=${from}&to=${to}&key=${process.env.JUHE_API_KEY}`,
+        );
+        const data = await response.json();
+
+        if (data.error_code !== 0) {
+            throw new Error(data.reason);
+        }
+
+        return {
+            success: true,
+            result: {
+                rate: data.result.rate,
+                timestamp: data.result.timestamp,
+            },
+        };
+    } catch (error) {
+        return {
+            success: false,
+            message: error.message,
+        };
     }
-    
-    return {
-      success: true,
-      result: {
-        rate: data.result.rate,
-        timestamp: data.result.timestamp
-      }
-    }
-  } catch (error) {
-    return {
-      success: false,
-      message: error.message
-    }
-  }
-})
+});
 ```
 
 ## 使用说明
@@ -394,17 +373,17 @@ JUHE_API_KEY=你的聚合数据API密钥
 ## 优化建议
 
 1. 缓存优化
-   - 使用 localStorage 缓存最近查询的汇率
-   - 设置合理的缓存过期时间
+    - 使用 localStorage 缓存最近查询的汇率
+    - 设置合理的缓存过期时间
 
 2. 性能优化
-   - 使用防抖处理频繁的汇率查询
-   - 按需加载 Chart.js
+    - 使用防抖处理频繁的汇率查询
+    - 按需加载 Chart.js
 
 3. 用户体验
-   - 添加常用币种收藏功能
-   - 支持快捷键操作
-   - 添加汇率提醒功能
+    - 添加常用币种收藏功能
+    - 支持快捷键操作
+    - 添加汇率提醒功能
 
 ## 下一步
 
