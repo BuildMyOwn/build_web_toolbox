@@ -3,14 +3,14 @@ title: 天气查询功能实现
 description: 实现天气查询页面、天气卡片组件和城市搜索功能
 ---
 
-import Tabs from "@components/tabs/Tabs.astro";
-import TabItem from "@components/tabs/TabItem.astro";
+import Tabs from '@components/tabs/Tabs.astro';
+import TabItem from '@components/tabs/TabItem.astro';
 
 # {frontmatter.title}
 
 <Tabs>
-    <TabItem label="恒星">天狼星，织女星，参宿四</TabItem>
-    <TabItem label="卫星">木卫一，木卫二，木卫三</TabItem>
+  <TabItem label="恒星">天狼星，织女星，参宿四</TabItem>
+  <TabItem label="卫星">木卫一，木卫二，木卫三</TabItem>
 </Tabs>
 
 在这一节中，我们将实现一个完整的天气查询功能。主要包括以下内容：
@@ -29,10 +29,11 @@ import TabItem from "@components/tabs/TabItem.astro";
 ![juhe](./images/4.png)
 
 1. 注册聚合数据账号并获取 API Key：
-    - 访问 [聚合数据官网](https://www.juhe.cn/)
-    - 注册账号并实名认证
-    - 申请天气预报 API
-    - 获取 API Key
+
+   - 访问 [聚合数据官网](https://www.juhe.cn/)
+   - 注册账号并实名认证
+   - 申请天气预报 API
+   - 获取 API Key
 
 2. 创建环境变量文件：
 
@@ -206,35 +207,35 @@ try { loading.value = true error.value = ''
 以下是我得到的代码，供你参考：
 
 ```astro
+<!-- pages/weather/index.astro -->
 ---
-import AppLayout from "../../layouts/AppLayout.astro";
-import WeatherCard from "../../components/WeatherCard.vue";
+import AppLayout from '../../layouts/AppLayout.astro'
+import WeatherCard from '../../components/WeatherCard.vue'
 
 // 示例天气数据
 const exampleWeather = {
-    city: "北京",
-    date: new Date().toLocaleDateString("zh-CN"),
-    temperature: "25",
-    weather: "晴",
-    wind: "东北风 3级",
-    humidity: "45%",
-};
+  city: '北京',
+  date: new Date().toLocaleDateString('zh-CN'),
+  temperature: '25',
+  weather: '晴',
+  wind: '东北风 3级',
+  humidity: '45%'
+}
 ---
 
-<!-- pages/weather/index.astro -->
 <AppLayout>
-    <div class="mx-auto max-w-4xl">
-        <h1 class="mb-8 text-3xl font-bold">天气查询</h1>
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold mb-8">天气查询</h1>
 
-        <!-- 使用 Vue 组件 -->
-        <div class="flex justify-center">
-            <WeatherCard client:load weather={exampleWeather} />
-        </div>
-
-        <div class="mt-8 text-center text-gray-600">
-            <p>这是一个示例展示，完整功能请参考上方 Vue 组件的实现。</p>
-        </div>
+    <!-- 使用 Vue 组件 -->
+    <div class="flex justify-center">
+      <WeatherCard client:load weather={exampleWeather} />
     </div>
+
+    <div class="mt-8 text-center text-gray-600">
+      <p>这是一个示例展示，完整功能请参考上方 Vue 组件的实现。</p>
+    </div>
+  </div>
 </AppLayout>
 ```
 
@@ -267,67 +268,67 @@ const exampleWeather = {
 
 ```ts
 // pages/api/weather/index.ts
-import type { APIRoute } from "astro";
+import type { APIRoute } from 'astro';
 
 interface WeatherResponse {
-    city: string;
-    date: string;
-    temperature: string;
-    weather: string;
-    wind: string;
-    humidity: string;
+  city: string;
+  date: string;
+  temperature: string;
+  weather: string;
+  wind: string;
+  humidity: string;
 }
 
 export const GET: APIRoute = async ({ request }) => {
-    try {
-        const url = new URL(request.url);
-        const city = url.searchParams.get("city");
+  try {
+    const url = new URL(request.url);
+    const city = url.searchParams.get('city');
 
-        if (!city) {
-            return new Response(
-                JSON.stringify({
-                    error: "请提供城市名称",
-                }),
-                { status: 400 },
-            );
-        }
-
-        const JUHE_WEATHER_KEY = import.meta.env.JUHE_WEATHER_KEY;
-        const apiUrl = `http://apis.juhe.cn/simpleWeather/query?city=${encodeURIComponent(
-            city,
-        )}&key=${JUHE_WEATHER_KEY}`;
-
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-
-        if (data.error_code !== 0) {
-            return new Response(
-                JSON.stringify({
-                    error: data.reason || "获取天气信息失败",
-                }),
-                { status: 500 },
-            );
-        }
-
-        const weatherInfo = data.result.realtime;
-        const weatherData: WeatherResponse = {
-            city,
-            date: new Date().toLocaleDateString("zh-CN"),
-            temperature: weatherInfo.temperature,
-            weather: weatherInfo.info,
-            wind: `${weatherInfo.direct} ${weatherInfo.power}`,
-            humidity: weatherInfo.humidity,
-        };
-
-        return new Response(JSON.stringify(weatherData), { status: 200 });
-    } catch (error) {
-        return new Response(
-            JSON.stringify({
-                error: "服务器内部错误",
-            }),
-            { status: 500 },
-        );
+    if (!city) {
+      return new Response(
+        JSON.stringify({
+          error: '请提供城市名称',
+        }),
+        { status: 400 }
+      );
     }
+
+    const JUHE_WEATHER_KEY = import.meta.env.JUHE_WEATHER_KEY;
+    const apiUrl = `http://apis.juhe.cn/simpleWeather/query?city=${encodeURIComponent(
+      city
+    )}&key=${JUHE_WEATHER_KEY}`;
+
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+
+    if (data.error_code !== 0) {
+      return new Response(
+        JSON.stringify({
+          error: data.reason || '获取天气信息失败',
+        }),
+        { status: 500 }
+      );
+    }
+
+    const weatherInfo = data.result.realtime;
+    const weatherData: WeatherResponse = {
+      city,
+      date: new Date().toLocaleDateString('zh-CN'),
+      temperature: weatherInfo.temperature,
+      weather: weatherInfo.info,
+      wind: `${weatherInfo.direct} ${weatherInfo.power}`,
+      humidity: weatherInfo.humidity,
+    };
+
+    return new Response(JSON.stringify(weatherData), { status: 200 });
+  } catch (error) {
+    return new Response(
+      JSON.stringify({
+        error: '服务器内部错误',
+      }),
+      { status: 500 }
+    );
+  }
 };
 ```
 
@@ -336,74 +337,74 @@ export const GET: APIRoute = async ({ request }) => {
 
 ```ts
 // pages/api/weather/cities.ts
-import type { APIRoute } from "astro";
+import type { APIRoute } from 'astro';
 
-import ReferenceAnswer from "@/components/common/ReferenceAnswer.vue";
+import ReferenceAnswer from '@/components/common/ReferenceAnswer.vue';
 
 interface CitySearchResponse {
-    cities: string[];
+  cities: string[];
 }
 
 // 模拟城市数据库
 const cityDatabase = [
-    "北京",
-    "上海",
-    "广州",
-    "深圳",
-    "杭州",
-    "南京",
-    "成都",
-    "武汉",
-    "西安",
-    "重庆",
-    "天津",
-    "苏州",
-    "长沙",
-    "郑州",
-    "青岛",
-    "大连",
-    "宁波",
-    "厦门",
-    "福州",
-    "济南",
-    "合肥",
-    "昆明",
-    "哈尔滨",
-    "沈阳",
+  '北京',
+  '上海',
+  '广州',
+  '深圳',
+  '杭州',
+  '南京',
+  '成都',
+  '武汉',
+  '西安',
+  '重庆',
+  '天津',
+  '苏州',
+  '长沙',
+  '郑州',
+  '青岛',
+  '大连',
+  '宁波',
+  '厦门',
+  '福州',
+  '济南',
+  '合肥',
+  '昆明',
+  '哈尔滨',
+  '沈阳',
 ];
 
 export const GET: APIRoute = async ({ request }) => {
-    try {
-        const url = new URL(request.url);
-        const query = url.searchParams.get("query");
+  try {
+    const url = new URL(request.url);
+    const query = url.searchParams.get('query');
 
-        if (!query) {
-            return new Response(
-                JSON.stringify({
-                    cities: [],
-                }),
-                { status: 200 },
-            );
-        }
-
-        // 简单的模糊搜索实现
-        const matchedCities = cityDatabase.filter((city) =>
-            city.toLowerCase().includes(query.toLowerCase()),
-        );
-
-        const response: CitySearchResponse = {
-            cities: matchedCities,
-        };
-
-        return new Response(JSON.stringify(response), { status: 200 });
-    } catch (error) {
-        return new Response(
-            JSON.stringify({
-                error: "服务器内部错误",
-            }),
-            { status: 500 },
-        );
+    if (!query) {
+      return new Response(
+        JSON.stringify({
+          cities: [],
+        }),
+        { status: 200 }
+      );
     }
+
+    // 简单的模糊搜索实现
+    const matchedCities = cityDatabase.filter((city) =>
+      city.toLowerCase().includes(query.toLowerCase())
+    );
+
+    const response: CitySearchResponse = {
+      cities: matchedCities,
+    };
+
+    return new Response(JSON.stringify(response), { status: 200 });
+  } catch (error) {
+    return new Response(
+      JSON.stringify({
+        error: '服务器内部错误',
+      }),
+      { status: 500 }
+    );
+  }
 };
 ```
 
@@ -413,11 +414,12 @@ export const GET: APIRoute = async ({ request }) => {
 这两个 API 端点的功能说明：
 
 1. 天气查询接口 (`/api/weather`)：
-    - 接收城市名称作为查询参数
-    - 调用聚合数据天气 API 获取实时天气信息
-    - 返回格式化后的天气数据
+
+   - 接收城市名称作为查询参数
+   - 调用聚合数据天气 API 获取实时天气信息
+   - 返回格式化后的天气数据
 
 2. 城市搜索接口 (`/api/weather/cities`)：
-    - 接收搜索关键词作为查询参数
-    - 在预设的城市数据中进行模糊搜索
-    - 返回匹配的城市列表
+   - 接收搜索关键词作为查询参数
+   - 在预设的城市数据中进行模糊搜索
+   - 返回匹配的城市列表

@@ -3,8 +3,8 @@ title: 初始化
 description: 配置在线工具箱项目的开发环境
 ---
 
-import Tabs from "@components/tabs/Tabs.astro";
-import TabItem from "@components/tabs/TabItem.astro";
+import Tabs from '@components/tabs/Tabs.astro';
+import TabItem from '@components/tabs/TabItem.astro';
 
 # {frontmatter.title}
 
@@ -126,8 +126,10 @@ cat ~/.ssh/id_ed25519.pub
 2. 启动项目并查看：
 
 <Tabs>
-    <TabItem label="AI提示词">你可使用以下 AI 提示词来启动项目： ```bash 启动项目 ```</TabItem>
-    <TabItem label="参考代码">```bash pnpm dev ```</TabItem>
+  <TabItem label="AI提示词">
+    你可使用以下 AI 提示词来启动项目： ```bash 启动项目 ```
+  </TabItem>
+  <TabItem label="参考代码">```bash pnpm dev ```</TabItem>
 </Tabs>
 
 打开其中展示的网址，会看到以下界面：
@@ -139,18 +141,19 @@ cat ~/.ssh/id_ed25519.pub
 由于 Astro 在初始化项目时已经完成了 Git 仓库的配置，我们只需要使用 GitHub Desktop 将项目推送到 GitHub 即可。
 
 1. 添加本地项目：
-    - 打开 GitHub Desktop
-    - 点击 "File" > "Add Local Repository"
-    - 选择项目所在目录（web-toolbox 文件夹）
-    - GitHub Desktop 会自动识别这是一个 Git 仓库
+
+   - 打开 GitHub Desktop
+   - 点击 "File" > "Add Local Repository"
+   - 选择项目所在目录（web-toolbox 文件夹）
+   - GitHub Desktop 会自动识别这是一个 Git 仓库
 
 2. 创建 GitHub 仓库：
-    - 点击 "Publish repository"
-    - 填写仓库信息：
-        - Name: web-toolbox
-        - Description: 在线工具箱项目
-        - 选择是否保持仓库私有（推荐选择 Public）
-    - 点击 "Publish Repository"
+   - 点击 "Publish repository"
+   - 填写仓库信息：
+     - Name: web-toolbox
+     - Description: 在线工具箱项目
+     - 选择是否保持仓库私有（推荐选择 Public）
+   - 点击 "Publish Repository"
 
 现在你的项目已经成功托管到 GitHub 上了。你可以通过 GitHub Desktop 方便地进行代码的提交、推送和拉取操作。
 
@@ -159,10 +162,11 @@ cat ~/.ssh/id_ed25519.pub
 1. 安装 Tailwind CSS 集成：
 
 <Tabs>
-    <TabItem label="AI提示词">
-        你可使用以下 AI 提示词来安装 Tailwind CSS 集成： ```bash 安装 Astro Tailwind 集成 ```
-    </TabItem>
-    <TabItem label="参考代码">```bash pnpm astro add tailwind ```</TabItem>
+  <TabItem label="AI提示词">
+    你可使用以下 AI 提示词来安装 Tailwind CSS 集成： ```bash 安装 Astro Tailwind
+    集成 ```
+  </TabItem>
+  <TabItem label="参考代码">```bash pnpm astro add tailwind ```</TabItem>
 </Tabs>
 
 2. 配置 Tailwind CSS（`tailwind.config.mjs`）：
@@ -189,12 +193,13 @@ cat ~/.ssh/id_ed25519.pub
 3. 创建全局样式文件（`src/styles/global.css`）：
 
 <Tabs>
-    <TabItem label="AI提示词">
-        你可使用以下 AI 提示词来创建全局样式文件： ```bash 创建 Tailwind CSS 全局样式文件 ```
-    </TabItem>
-    <TabItem label="参考代码">
-        ```css @tailwind base; @tailwind components; @tailwind utilities; ```
-    </TabItem>
+  <TabItem label="AI提示词">
+    你可使用以下 AI 提示词来创建全局样式文件： ```bash 创建 Tailwind CSS
+    全局样式文件 ```
+  </TabItem>
+  <TabItem label="参考代码">
+    ```css @tailwind base; @tailwind components; @tailwind utilities; ```
+  </TabItem>
 </Tabs>
 
 4. 在布局文件中引入样式（`src/layouts/Layout.astro`）：
@@ -276,9 +281,9 @@ export default {
 </Tabs>
 
 3. 验证安装：
-    - 重启开发服务器
-    - 在任意组件中使用 DaisyUI 的组件类名
-    - 确认样式是否正确应用
+   - 重启开发服务器
+   - 在任意组件中使用 DaisyUI 的组件类名
+   - 确认样式是否正确应用
 
 ### 第五步：启用 SSR 模式
 
@@ -306,7 +311,7 @@ export default {
     import vue from '@astrojs/vue';
     import tailwind from '@astrojs/tailwind';
 
-import ReferenceAnswer from "@/components/common/ReferenceAnswer.vue";
+import ReferenceAnswer from '@/components/common/ReferenceAnswer.vue';
 
 export default defineConfig({
   output: 'server',  // 启用 SSR 模式
@@ -323,21 +328,25 @@ export default defineConfig({
 2. 创建环境变量文件（`.env`）：
 
 <Tabs>
-    <TabItem label="AI提示词">
-        你可使用以下 AI 提示词来创建环境变量文件： ```bash 创建环境变量文件来存储我的聚合数据 API
-        密钥 ```
-    </TabItem>
-    <TabItem label="参考代码">```plaintext JUHE_API_KEY=你的聚合数据API密钥 ```</TabItem>
+  <TabItem label="AI提示词">
+    你可使用以下 AI 提示词来创建环境变量文件： ```bash
+    创建环境变量文件来存储我的聚合数据 API 密钥 ```
+  </TabItem>
+  <TabItem label="参考代码">
+    ```plaintext JUHE_API_KEY=你的聚合数据API密钥 ```
+  </TabItem>
 </Tabs>
 
 3. 在 `.gitignore` 中添加环境变量文件：
 
 <Tabs>
-    <TabItem label="AI提示词">
-        你可使用以下 AI 提示词来在 `.gitignore` 中添加环境变量文件： ```bash 在 `.gitignore`
-        中添加环境变量文件 ```
-    </TabItem>
-    <TabItem label="参考代码">```plaintext # 环境变量 .env .env.* !.env.example ```</TabItem>
+  <TabItem label="AI提示词">
+    你可使用以下 AI 提示词来在 `.gitignore` 中添加环境变量文件： ```bash 在
+    `.gitignore` 中添加环境变量文件 ```
+  </TabItem>
+  <TabItem label="参考代码">
+    ```plaintext # 环境变量 .env .env.* !.env.example ```
+  </TabItem>
 </Tabs>
 
 ### 第六步：安装配置 Vue
