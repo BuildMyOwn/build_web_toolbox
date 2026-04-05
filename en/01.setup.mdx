@@ -1,10 +1,11 @@
 ---
+lastChecked: 2026-03-18T03:36:16.944Z
 title: 初始化
 description: 配置在线工具箱项目的开发环境
 ---
 
-import Tabs from '@components/tabs/Tabs.astro';
-import TabItem from '@components/tabs/TabItem.astro';
+import Tabs from '@/components/tabs/Tabs.astro';
+import TabItem from '@/components/tabs/TabItem.astro';
 
 # {frontmatter.title}
 
@@ -311,7 +312,7 @@ export default {
     import vue from '@astrojs/vue';
     import tailwind from '@astrojs/tailwind';
 
-import ReferenceAnswer from '@/components/common/ReferenceAnswer.vue';
+import ReferenceAnswer from '@/components/common/ReferenceAnswer.astro';
 
 export default defineConfig({
   output: 'server',  // 启用 SSR 模式

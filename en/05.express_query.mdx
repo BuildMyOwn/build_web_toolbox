@@ -1,4 +1,5 @@
 ---
+lastChecked: 2026-03-18T03:36:16.944Z
 title: 快递查询功能实现
 description: 实现快递查询页面、快递信息展示组件和查询历史记录功能
 ---
@@ -318,7 +319,7 @@ function clearHistory() {
 // server/api/express/query.ts
 import { defineEventHandler, readBody } from 'h3';
 
-import ReferenceAnswer from '@/components/common/ReferenceAnswer.vue';
+import ReferenceAnswer from '@/components/common/ReferenceAnswer.astro';
 
 export default defineEventHandler(async event => {
     try {

@@ -1,10 +1,11 @@
 ---
+lastChecked: 2026-03-18T03:36:16.944Z
 title: 天气查询功能实现
 description: 实现天气查询页面、天气卡片组件和城市搜索功能
 ---
 
-import Tabs from '@components/tabs/Tabs.astro';
-import TabItem from '@components/tabs/TabItem.astro';
+import Tabs from '@/components/tabs/Tabs.astro';
+import TabItem from '@/components/tabs/TabItem.astro';
 
 # {frontmatter.title}
 
@@ -339,7 +340,7 @@ export const GET: APIRoute = async ({ request }) => {
 // pages/api/weather/cities.ts
 import type { APIRoute } from 'astro';
 
-import ReferenceAnswer from '@/components/common/ReferenceAnswer.vue';
+import ReferenceAnswer from '@/components/common/ReferenceAnswer.astro';
 
 interface CitySearchResponse {
   cities: string[];

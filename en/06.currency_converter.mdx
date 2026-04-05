@@ -1,4 +1,5 @@
 ---
+lastChecked: 2026-03-18T03:36:16.944Z
 title: 汇率转换功能实现
 description: 开发在线工具箱的汇率转换功能，包括实时汇率查询和历史走势
 ---
@@ -326,7 +327,7 @@ const chartConfig = computed(() => ({
 // server/api/currency/rate.ts
 import { defineEventHandler } from 'h3'
 
-import ReferenceAnswer from '@/components/common/ReferenceAnswer.vue';
+import ReferenceAnswer from '@/components/common/ReferenceAnswer.astro';
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)

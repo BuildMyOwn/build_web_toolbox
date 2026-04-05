@@ -1,4 +1,5 @@
 ---
+lastChecked: 2026-03-18T03:36:16.944Z
 title: 图片处理工具实现
 description: 开发在线工具箱的图片处理功能，包括图片压缩、格式转换和简单编辑
 ---
@@ -439,7 +440,7 @@ const handleConvert = async (file: File) => {
 // workers/imageProcessor.worker.ts
 import sharp from 'sharp'
 
-import ReferenceAnswer from '@/components/common/ReferenceAnswer.vue';
+import ReferenceAnswer from '@/components/common/ReferenceAnswer.astro';
 
 self.addEventListener('message', async (e) => {
   const { file, type, options } = e.data
